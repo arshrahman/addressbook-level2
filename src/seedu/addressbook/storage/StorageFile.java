@@ -9,8 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 /**
  * Represents the file used to store address book data.
@@ -29,6 +28,15 @@ public class StorageFile {
      */
     public static class InvalidStorageFilePathException extends IllegalValueException {
         public InvalidStorageFilePathException(String message) {
+            super(message);
+        }
+    }
+    
+    /**
+     * Signals that the storage file cannot be found on the specified location
+     */
+    public static class StorageFileNotFoundException extends FileNotFoundException {
+		public StorageFileNotFoundException(String message) {
             super(message);
         }
     }
@@ -67,7 +75,8 @@ public class StorageFile {
         path = Paths.get(filePath);
         if (!isValidPath(path)) {
             throw new InvalidStorageFilePathException("Storage file should end with '.txt'");
-        }
+        } 
+        
     }
 
     /**
@@ -82,12 +91,19 @@ public class StorageFile {
      * Saves all data to this storage file.
      *
      * @throws StorageOperationException if there were errors converting and/or storing data to file.
+     * @throws StorageFileNotFoundException 
      */
-    public void save(AddressBook addressBook) throws StorageOperationException {
+    public boolean save(AddressBook addressBook) throws StorageOperationException {
 
         /* Note: Note the 'try with resource' statement below.
          * More info: https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
          */
+    	
+    	boolean isFileExists = Files.exists(path.getFileName());
+//    	if (!isFileExists) {
+//    		throw new StorageFileNotFoundException("The Storage file was not found in the specified location!");
+//    	}
+    	
         try (final Writer fileWriter =
                      new BufferedWriter(new FileWriter(path.toFile()))) {
 
@@ -95,18 +111,21 @@ public class StorageFile {
             final Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(toSave, fileWriter);
-
+           
         } catch (IOException ioe) {
             throw new StorageOperationException("Error writing to file: " + path);
         } catch (JAXBException jaxbe) {
             throw new StorageOperationException("Error converting address book into storage format");
         }
+        
+        return isFileExists;
     }
 
     /**
      * Loads data from this storage file.
      *
      * @throws StorageOperationException if there were errors reading and/or converting data from file.
+     * @throws StorageFileNotFoundException 
      */
     public AddressBook load() throws StorageOperationException {
         try (final Reader fileReader =

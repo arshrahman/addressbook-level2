@@ -54,7 +54,7 @@ public class Main {
             this.storage = initializeStorage(launchArgs);
             this.addressBook = storage.load();
             ui.showWelcomeMessage(VERSION, storage.getPath());
-
+        	
         } catch (InvalidStorageFilePathException | StorageOperationException e) {
             ui.showInitFailedMessage();
             /*
@@ -107,7 +107,10 @@ public class Main {
         try {
             command.setData(addressBook, lastShownList);
             CommandResult result = command.execute();
-            storage.save(addressBook);
+            if (!storage.save(addressBook)) {
+                //ui.showToUser("Warning! The Addressbook was re-created as the system wasn't able to find the file on the specified location!");
+            	throw new StorageFileNotFoundException("Warning! The Addressbook was re-created as the system wasn't able to find the file on the specified location!");
+            }
             return result;
         } catch (Exception e) {
             ui.showToUser(e.getMessage());
