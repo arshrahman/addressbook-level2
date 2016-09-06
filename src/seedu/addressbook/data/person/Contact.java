@@ -2,13 +2,15 @@ package seedu.addressbook.data.person;
 
 import seedu.addressbook.data.exception.IllegalValueException;
 
-public class Contact {
+public class Contact implements Printable{
 	
 	private final String value;
+	private final String className;
 	private boolean isPrivate;
 	
-	public Contact(String contact, boolean isPrivate, String validationRegex, String messageConstraints) throws IllegalValueException {
+	public Contact(String contact, boolean isPrivate, String validationRegex, String messageConstraints, String className) throws IllegalValueException {
 		this.value = contact;
+		this.className = className;
 		this.isPrivate = isPrivate;
 		if (!isValidContact(contact, validationRegex)) {
 			throw new IllegalValueException(messageConstraints);
@@ -30,5 +32,10 @@ public class Contact {
 
 	public boolean isPrivate() {
 		return isPrivate;
+	}
+
+	@Override
+	public String getPrintableString() {
+		return className + ((this.isPrivate) ? detailIsPrivate : value);
 	}
 }

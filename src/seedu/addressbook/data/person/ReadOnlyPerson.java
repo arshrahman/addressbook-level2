@@ -1,5 +1,7 @@
 package seedu.addressbook.data.person;
 
+import java.util.StringJoiner;
+
 import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 
@@ -80,6 +82,7 @@ public interface ReadOnlyPerson {
         for (Tag tag : getTags()) {
             builder.append(tag);
         }
+        
         return builder.toString();
     }
 }
