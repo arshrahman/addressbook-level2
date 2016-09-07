@@ -36,7 +36,7 @@ public class Tagging {
     
     @Override
     public String toString() {
-    	return new StringJoiner(tagStatusPrefix.get(tagStatus), "[", "]")
+    	return new StringJoiner("[", tagStatusPrefix.get(tagStatus), "]")
     			.add(this.person.getName().toString())
     			.add(this.tag.tagName.toString()).toString();
     }
